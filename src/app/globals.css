@@ -1,8 +1,69 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background layers - Neutral dark with subtle cool tones */
+  --bg-primary: #0f1114;
+  --bg-secondary: #16191d;
+  --bg-tertiary: #1e2227;
+  --bg-hover: #252a30;
+
+  /* Text */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Borders */
+  --border-color: #2a2f36;
+  --border-light: #3a4049;
+
+  /* Accent - Teal/Cyan */
+  --accent: #2dd4bf;
+  --accent-hover: #14b8a6;
+  --accent-light: #5eead4;
+
+  /* Status colors */
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.15);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.15);
+  --error: #f87171;
+  --error-bg: rgba(248, 113, 113, 0.15);
+
+  /* Income/Expense indicators */
+  --income: #2dd4bf;
+  --income-bg: rgba(45, 212, 191, 0.2);
+  --expense: #f87171;
+  --expense-bg: rgba(248, 113, 113, 0.2);
+
+  /* Card accent colors (from the UI) */
+  --card-coral: #f87171;
+  --card-purple: #a78bfa;
+  --card-blue: #60a5fa;
+  --card-mint: #d1fae5;
+
+  /* Chart colors */
+  --chart-teal: #2dd4bf;
+  --chart-orange: #fb923c;
+  --chart-yellow: #fbbf24;
+
+  /* Category colors */
+  --cat-utilities: #a78bfa;
+  --cat-rent: #f87171;
+  --cat-salaries: #2dd4bf;
+  --cat-inventory: #fb923c;
+  --cat-marketing: #a3e635;
+  --cat-maintenance: #fbbf24;
+  --cat-supplies: #34d399;
+  --cat-transport: #818cf8;
+  --cat-taxes: #f87171;
+  --cat-other: #94a3b8;
+  --cat-sales: #2dd4bf;
+  --cat-services: #60a5fa;
+  --cat-refund: #c084fc;
+
+  /* Legacy compatibility */
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
@@ -12,15 +73,79 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  /* Prevent scrollbar from shifting content */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+@media (max-width: 1023px) {
+  body {
+    scrollbar-gutter: auto;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Safe area for iOS devices */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* Input autofill override for dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-tertiary) inset;
+  transition: background-color 5000s ease-in-out 0s;
 }

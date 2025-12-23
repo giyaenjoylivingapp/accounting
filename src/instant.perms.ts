@@ -2,23 +2,46 @@
 
 import type { InstantRules } from "@instantdb/react";
 
+// Only this email can access the app
+const ALLOWED_EMAIL = "giyaenjoyliving.app@gmail.com";
+
 const rules = {
-  /**
-   * Welcome to Instant's permission system!
-   * Right now your rules are empty. To start filling them in, check out the docs:
-   * https://www.instantdb.com/docs/permissions
-   *
-   * Here's an example to give you a feel:
-   * posts: {
-   *   allow: {
-   *     view: "true",
-   *     create: "isOwner",
-   *     update: "isOwner",
-   *     delete: "isOwner",
-   *   },
-   *   bind: ["isOwner", "auth.id != null && auth.id == data.ownerId"],
-   * },
-   */
+  // Lock down schema modifications
+  attrs: {
+    allow: {
+      $default: "false",
+    },
+  },
+
+  // Transaction permissions - only authorized email
+  transactions: {
+    allow: {
+      view: `auth.email == '${ALLOWED_EMAIL}'`,
+      create: `auth.email == '${ALLOWED_EMAIL}'`,
+      update: `auth.email == '${ALLOWED_EMAIL}'`,
+      delete: `auth.email == '${ALLOWED_EMAIL}'`,
+    },
+  },
+
+  // Daily balances - only authorized email
+  dailyBalances: {
+    allow: {
+      view: `auth.email == '${ALLOWED_EMAIL}'`,
+      create: `auth.email == '${ALLOWED_EMAIL}'`,
+      update: `auth.email == '${ALLOWED_EMAIL}'`,
+      delete: `auth.email == '${ALLOWED_EMAIL}'`,
+    },
+  },
+
+  // Settings - only authorized email, no delete
+  settings: {
+    allow: {
+      view: `auth.email == '${ALLOWED_EMAIL}'`,
+      create: `auth.email == '${ALLOWED_EMAIL}'`,
+      update: `auth.email == '${ALLOWED_EMAIL}'`,
+      delete: "false",
+    },
+  },
 } satisfies InstantRules;
 
 export default rules;
