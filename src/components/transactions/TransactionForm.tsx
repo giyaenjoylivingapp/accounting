@@ -170,7 +170,7 @@ export function TransactionForm({
       title={isEditing ? "Edit Transaction" : "Add Transaction"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-5">
+      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-4">
         {/* Type Toggle */}
         <Toggle
           options={[
@@ -184,13 +184,20 @@ export function TransactionForm({
           }}
         />
 
-        {/* Desktop: Two column layout for currency and amount */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Currency Toggle */}
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-              Currency
-            </label>
+        {/* Currency and Amount row */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Currency Toggle - Short labels on mobile, full on desktop */}
+          <div className="lg:hidden">
+            <Toggle
+              options={[
+                { value: CURRENCIES.USD, label: "$" },
+                { value: CURRENCIES.CDF, label: "FC" },
+              ]}
+              value={currency}
+              onChange={(v) => setCurrency(v as Currency)}
+            />
+          </div>
+          <div className="hidden lg:block">
             <Toggle
               options={[
                 { value: CURRENCIES.USD, label: "USD ($)" },
@@ -204,19 +211,13 @@ export function TransactionForm({
           {/* Amount */}
           <Input
             type="text"
-            label="Amount"
-            placeholder={currency === "USD" ? "0.00" : "0"}
+            placeholder={currency === "USD" ? "Amount" : "Amount"}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             leftIcon={
               <span className="text-[var(--text-muted)]">
-                {currency === "USD" ? "$" : ""}
+                {currency === "USD" ? "$" : "FC"}
               </span>
-            }
-            rightIcon={
-              currency === "CDF" ? (
-                <span className="text-[var(--text-muted)]">FC</span>
-              ) : undefined
             }
             inputMode="decimal"
             required
@@ -224,22 +225,20 @@ export function TransactionForm({
           />
         </div>
 
-        {/* Desktop: Two column layout for category and date */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Category and Date row */}
+        <div className="grid grid-cols-2 gap-3">
           {/* Category */}
           <Select
-            label="Category"
             options={categories}
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            placeholder="Select a category"
+            placeholder="Category"
             required
           />
 
           {/* Date */}
           <Input
             type="date"
-            label="Date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
@@ -249,7 +248,6 @@ export function TransactionForm({
         {/* Description - Full width */}
         <Input
           type="text"
-          label="Description"
           placeholder="What was this for?"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -259,44 +257,36 @@ export function TransactionForm({
         {/* Optional fields */}
         <details className="group">
           <summary className="cursor-pointer text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors py-1">
-            <span className="group-open:hidden">+ Add more details</span>
+            <span className="group-open:hidden">+ More details</span>
             <span className="hidden group-open:inline">- Hide details</span>
           </summary>
-          <div className="space-y-4 mt-4 pt-4 border-t border-[var(--border-color)]">
-            {/* Desktop: Two column layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-3 mt-3 pt-3 border-t border-[var(--border-color)]">
+            <div className="grid grid-cols-2 gap-3">
               <Input
                 type="text"
-                label="Vendor / Paid To"
-                placeholder="Who was paid or who paid you?"
+                placeholder="Vendor / Paid to"
                 value={vendor}
                 onChange={(e) => setVendor(e.target.value)}
               />
 
               <Select
-                label="Payment Method"
                 options={PAYMENT_METHODS.map((m) => ({
                   value: m.value,
                   label: m.label,
                 }))}
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                placeholder="How was this paid?"
+                placeholder="Payment method"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-                Notes
-              </label>
-              <textarea
-                className="w-full px-3 py-2.5 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors hover:border-[var(--border-light)] focus:border-[var(--accent)] focus:outline-none resize-none"
-                placeholder="Any additional notes..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
+            <textarea
+              className="w-full px-3 py-2.5 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors hover:border-[var(--border-light)] focus:border-[var(--accent)] focus:outline-none resize-none"
+              placeholder="Notes..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+            />
           </div>
         </details>
 
@@ -305,13 +295,13 @@ export function TransactionForm({
           <p className="text-sm text-[var(--error)] text-center">{error}</p>
         )}
 
-        {/* Actions - Desktop: aligned to right */}
-        <div className="flex flex-col-reverse lg:flex-row gap-3 pt-2 lg:justify-end">
-          <Button type="button" variant="secondary" onClick={onClose} className="lg:w-auto lg:px-6">
+        {/* Actions - Same row on all screens */}
+        <div className="flex gap-3 pt-1">
+          <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button type="submit" loading={loading} className="lg:w-auto lg:px-8">
-            {isEditing ? "Save Changes" : "Add Transaction"}
+          <Button type="submit" loading={loading} className="flex-1">
+            {isEditing ? "Save" : "Add"}
           </Button>
         </div>
       </form>

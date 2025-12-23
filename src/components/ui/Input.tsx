@@ -27,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className="w-full">
+      <div className="w-full min-w-0 max-w-full overflow-hidden">
         {label && (
           <label
             htmlFor={inputId}
@@ -46,7 +46,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={`
-              w-full px-3 py-2.5
+              w-full min-w-0 max-w-full px-3 py-2.5
               bg-[var(--bg-tertiary)]
               border border-[var(--border-color)]
               rounded-lg
@@ -57,6 +57,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               focus:border-[var(--accent)]
               focus:outline-none
               disabled:opacity-50 disabled:cursor-not-allowed
+              [&[type='date']]:appearance-none
+              [&[type='date']]:text-base
               ${leftIcon ? "pl-10" : ""}
               ${rightIcon ? "pr-10" : ""}
               ${error ? "border-[var(--error)]" : ""}
