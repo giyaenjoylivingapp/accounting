@@ -7,7 +7,7 @@ import { CategoryBadge } from "./CategoryBadge";
 
 export interface TransactionData {
   id: string;
-  type: "income" | "expense";
+  type: "income" | "expense" | "transfer";
   description: string;
   amount: number;
   currency: Currency;
@@ -16,6 +16,10 @@ export interface TransactionData {
   vendor?: string;
   paymentMethod?: string;
   notes?: string;
+  // Transfer-specific fields
+  toCurrency?: Currency;
+  toAmount?: number;
+  exchangeRate?: number;
 }
 
 interface TransactionItemProps {
@@ -30,13 +34,14 @@ export function TransactionItem({
   onDelete,
 }: TransactionItemProps) {
   const isIncome = transaction.type === "income";
-  const amountColor = isIncome ? "var(--income)" : "var(--expense)";
-  const prefix = isIncome ? "+" : "-";
+  const isTransfer = transaction.type === "transfer";
+  const amountColor = isTransfer ? "var(--accent)" : isIncome ? "var(--income)" : "var(--expense)";
+  const prefix = isTransfer ? "" : isIncome ? "+" : "-";
 
   // Get category info for watermark
   const categoryInfo = getCategoryByValue(transaction.category);
   const categoryLabel = categoryInfo?.label || transaction.category;
-  const categoryColor = categoryInfo?.color || "var(--text-muted)";
+  const categoryColor = isTransfer ? "var(--accent)" : categoryInfo?.color || "var(--text-muted)";
 
   const formatDate = (date: Date) => {
     // Ensure we have a valid Date object
@@ -82,10 +87,29 @@ export function TransactionItem({
       <div
         className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative z-10"
         style={{
-          backgroundColor: isIncome ? "var(--income-bg)" : "var(--expense-bg)",
+          backgroundColor: isTransfer
+            ? "rgba(45, 212, 191, 0.1)"
+            : isIncome
+            ? "var(--income-bg)"
+            : "var(--expense-bg)",
         }}
       >
-        {isIncome ? (
+        {isTransfer ? (
+          <svg
+            className="w-5 h-5"
+            style={{ color: "var(--accent)" }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+            />
+          </svg>
+        ) : isIncome ? (
           <svg
             className="w-5 h-5"
             style={{ color: "var(--income)" }}
@@ -142,13 +166,29 @@ export function TransactionItem({
 
       {/* Amount */}
       <div className="text-right shrink-0 relative z-10">
-        <p className="font-semibold" style={{ color: amountColor }}>
-          {prefix}
-          {formatCurrency(transaction.amount, transaction.currency)}
-        </p>
-        <p className="text-xs text-[var(--text-muted)]">
-          {transaction.currency}
-        </p>
+        {isTransfer && transaction.toCurrency && transaction.toAmount ? (
+          <>
+            <p className="text-sm" style={{ color: "var(--expense)" }}>
+              -{formatCurrency(transaction.amount, transaction.currency)}
+            </p>
+            <p className="font-semibold" style={{ color: "var(--income)" }}>
+              +{formatCurrency(transaction.toAmount, transaction.toCurrency)}
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              Rate: {transaction.exchangeRate?.toLocaleString()}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-semibold" style={{ color: amountColor }}>
+              {prefix}
+              {formatCurrency(transaction.amount, transaction.currency)}
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              {transaction.currency}
+            </p>
+          </>
+        )}
       </div>
 
       {/* Delete button */}

@@ -5,10 +5,13 @@ import { Currency, TRANSACTION_TYPES } from "./constants";
 // Transaction type for balance calculations
 export interface Transaction {
   id: string;
-  type: "income" | "expense";
+  type: "income" | "expense" | "transfer";
   amount: number;
   currency: Currency;
   date: Date;
+  // Transfer-specific fields
+  toCurrency?: Currency;
+  toAmount?: number;
 }
 
 // Settings type for initial balances
@@ -32,6 +35,11 @@ export interface DailySummary {
   incomeCDF: number;
   expenseUSD: number;
   expenseCDF: number;
+  // Transfer tracking
+  transferOutUSD: number;  // USD exchanged out
+  transferInUSD: number;   // USD received from exchange
+  transferOutCDF: number;  // CDF exchanged out
+  transferInCDF: number;   // CDF received from exchange
   closingUSD: number;
   closingCDF: number;
 }
@@ -64,11 +72,29 @@ export function calculateCurrentBalance(
   let balanceCDF = initialBalance.initialBalanceCDF;
 
   for (const tx of transactions) {
-    const amount = tx.type === TRANSACTION_TYPES.INCOME ? tx.amount : -tx.amount;
-    if (tx.currency === "USD") {
-      balanceUSD += amount;
+    if (tx.type === TRANSACTION_TYPES.TRANSFER) {
+      // Transfer: subtract from source currency, add to destination
+      if (tx.currency === "USD") {
+        balanceUSD -= tx.amount;
+      } else {
+        balanceCDF -= tx.amount;
+      }
+      // Add to destination currency
+      if (tx.toCurrency && tx.toAmount) {
+        if (tx.toCurrency === "USD") {
+          balanceUSD += tx.toAmount;
+        } else {
+          balanceCDF += tx.toAmount;
+        }
+      }
     } else {
-      balanceCDF += amount;
+      // Income or Expense
+      const amount = tx.type === TRANSACTION_TYPES.INCOME ? tx.amount : -tx.amount;
+      if (tx.currency === "USD") {
+        balanceUSD += amount;
+      } else {
+        balanceCDF += amount;
+      }
     }
   }
 
@@ -110,14 +136,33 @@ export function calculateDailySummary(
     return txDate >= startOfDay && txDate <= endOfDay;
   });
 
-  // Calculate today's income and expenses by currency
+  // Calculate today's income, expenses, and transfers by currency
   let incomeUSD = 0;
   let incomeCDF = 0;
   let expenseUSD = 0;
   let expenseCDF = 0;
+  let transferOutUSD = 0;
+  let transferInUSD = 0;
+  let transferOutCDF = 0;
+  let transferInCDF = 0;
 
   for (const tx of todayTransactions) {
-    if (tx.type === TRANSACTION_TYPES.INCOME) {
+    if (tx.type === TRANSACTION_TYPES.TRANSFER) {
+      // Track transfer out (source currency)
+      if (tx.currency === "USD") {
+        transferOutUSD += tx.amount;
+      } else {
+        transferOutCDF += tx.amount;
+      }
+      // Track transfer in (destination currency)
+      if (tx.toCurrency && tx.toAmount) {
+        if (tx.toCurrency === "USD") {
+          transferInUSD += tx.toAmount;
+        } else {
+          transferInCDF += tx.toAmount;
+        }
+      }
+    } else if (tx.type === TRANSACTION_TYPES.INCOME) {
       if (tx.currency === "USD") incomeUSD += tx.amount;
       else incomeCDF += tx.amount;
     } else {
@@ -126,9 +171,9 @@ export function calculateDailySummary(
     }
   }
 
-  // Calculate closing balance
-  const closingUSD = opening.USD + incomeUSD - expenseUSD;
-  const closingCDF = opening.CDF + incomeCDF - expenseCDF;
+  // Calculate closing balance (income - expense - transferOut + transferIn)
+  const closingUSD = opening.USD + incomeUSD - expenseUSD - transferOutUSD + transferInUSD;
+  const closingCDF = opening.CDF + incomeCDF - expenseCDF - transferOutCDF + transferInCDF;
 
   return {
     date: dateKey,
@@ -138,6 +183,10 @@ export function calculateDailySummary(
     incomeCDF,
     expenseUSD,
     expenseCDF,
+    transferOutUSD,
+    transferInUSD,
+    transferOutCDF,
+    transferInCDF,
     closingUSD,
     closingCDF,
   };

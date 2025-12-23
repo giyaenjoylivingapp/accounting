@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -38,6 +38,8 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
       amount: t.amount,
       currency: t.currency,
       date: t.date,
+      toCurrency: t.toCurrency,
+      toAmount: t.toAmount,
     })),
     selectedDateObj
   );
@@ -62,10 +64,53 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
     }).format(new Date(date));
   };
 
-  // Handle print
-  const handlePrint = () => {
-    window.print();
+  // Format date as DD-MM-YYYY for filename
+  const formatDateForFilename = (dateStr: string) => {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}-${month}-${year}`;
   };
+
+  // Handle print with dynamic filename
+  const handlePrint = useCallback(() => {
+    // Store original title
+    const originalTitle = document.title;
+
+    // Format date for filename (DD-MM-YYYY)
+    const dateForFilename = formatDateForFilename(selectedDate);
+
+    // Set title to include the date (browsers use this as PDF filename)
+    document.title = `Gia Showroom Cash Book Report - ${dateForFilename}`;
+
+    // Print
+    window.print();
+
+    // Restore original title after a short delay
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 100);
+  }, [selectedDate]);
+
+  // Set up beforeprint/afterprint event handlers for more reliable title management
+  useEffect(() => {
+    const originalTitle = document.title;
+    const dateForFilename = formatDateForFilename(selectedDate);
+
+    const handleBeforePrint = () => {
+      document.title = `Gia Showroom Cash Book Report - ${dateForFilename}`;
+    };
+
+    const handleAfterPrint = () => {
+      document.title = originalTitle;
+    };
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+  }, [selectedDate]);
 
   return (
     <div className="space-y-4">
@@ -143,13 +188,24 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
                       </p>
                     </div>
                     <div className="text-right ml-3">
-                      <p
-                        className="font-semibold"
-                        style={{ color: tx.type === "income" ? "var(--income)" : "var(--expense)" }}
-                      >
-                        {tx.type === "income" ? "+" : "-"}
-                        {formatCurrency(tx.amount, tx.currency)}
-                      </p>
+                      {tx.type === "transfer" && tx.toCurrency && tx.toAmount ? (
+                        <>
+                          <p className="text-sm" style={{ color: "var(--expense)" }}>
+                            -{formatCurrency(tx.amount, tx.currency)}
+                          </p>
+                          <p className="font-semibold" style={{ color: "var(--income)" }}>
+                            +{formatCurrency(tx.toAmount, tx.toCurrency)}
+                          </p>
+                        </>
+                      ) : (
+                        <p
+                          className="font-semibold"
+                          style={{ color: tx.type === "income" ? "var(--income)" : "var(--expense)" }}
+                        >
+                          {tx.type === "income" ? "+" : "-"}
+                          {formatCurrency(tx.amount, tx.currency)}
+                        </p>
+                      )}
                     </div>
                   </div>
                   {tx.vendor && (
@@ -244,20 +300,28 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-right font-medium text-[var(--income)] print:text-green-700 whitespace-nowrap">
                         {tx.type === "income" && tx.currency === "USD"
                           ? formatCurrency(tx.amount, "USD")
+                          : tx.type === "transfer" && tx.toCurrency === "USD" && tx.toAmount
+                          ? formatCurrency(tx.toAmount, "USD")
                           : "-"}
                       </td>
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-right font-medium text-[var(--expense)] print:text-red-700 whitespace-nowrap">
                         {tx.type === "expense" && tx.currency === "USD"
+                          ? formatCurrency(tx.amount, "USD")
+                          : tx.type === "transfer" && tx.currency === "USD"
                           ? formatCurrency(tx.amount, "USD")
                           : "-"}
                       </td>
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-right font-medium text-[var(--income)] print:text-green-700 whitespace-nowrap">
                         {tx.type === "income" && tx.currency === "CDF"
                           ? formatCurrency(tx.amount, "CDF")
+                          : tx.type === "transfer" && tx.toCurrency === "CDF" && tx.toAmount
+                          ? formatCurrency(tx.toAmount, "CDF")
                           : "-"}
                       </td>
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-right font-medium text-[var(--expense)] print:text-red-700 whitespace-nowrap">
                         {tx.type === "expense" && tx.currency === "CDF"
+                          ? formatCurrency(tx.amount, "CDF")
+                          : tx.type === "transfer" && tx.currency === "CDF"
                           ? formatCurrency(tx.amount, "CDF")
                           : "-"}
                       </td>
@@ -311,23 +375,23 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
             <div>
               <p className="text-[var(--text-secondary)] print:text-gray-600 mb-1">Net Change (USD)</p>
               <p className={`font-semibold ${
-                summary.incomeUSD - summary.expenseUSD >= 0
+                summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0) >= 0
                   ? "text-[var(--income)] print:text-green-700"
                   : "text-[var(--expense)] print:text-red-700"
               }`}>
-                {summary.incomeUSD - summary.expenseUSD >= 0 ? "+" : ""}
-                {formatCurrency(summary.incomeUSD - summary.expenseUSD, "USD")}
+                {summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0) >= 0 ? "+" : ""}
+                {formatCurrency(summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0), "USD")}
               </p>
             </div>
             <div>
               <p className="text-[var(--text-secondary)] print:text-gray-600 mb-1">Net Change (CDF)</p>
               <p className={`font-semibold ${
-                summary.incomeCDF - summary.expenseCDF >= 0
+                summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0) >= 0
                   ? "text-[var(--income)] print:text-green-700"
                   : "text-[var(--expense)] print:text-red-700"
               }`}>
-                {summary.incomeCDF - summary.expenseCDF >= 0 ? "+" : ""}
-                {formatCurrency(summary.incomeCDF - summary.expenseCDF, "CDF")}
+                {summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0) >= 0 ? "+" : ""}
+                {formatCurrency(summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0), "CDF")}
               </p>
             </div>
           </div>

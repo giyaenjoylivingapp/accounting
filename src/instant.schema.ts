@@ -12,18 +12,22 @@ const _schema = i.schema({
       email: i.string().unique().indexed(),
     }),
 
-    // Transactions (both income and expenses)
+    // Transactions (income, expenses, and transfers)
     transactions: i.entity({
-      type: i.string().indexed(),       // 'income' | 'expense'
+      type: i.string().indexed(),       // 'income' | 'expense' | 'transfer'
       description: i.string(),
-      amount: i.number(),               // Always positive
-      currency: i.string().indexed(),   // 'USD' | 'CDF'
+      amount: i.number(),               // Always positive (for transfers: source amount)
+      currency: i.string().indexed(),   // 'USD' | 'CDF' (for transfers: source currency)
       category: i.string().indexed(),   // Category of transaction
       date: i.date().indexed(),         // Transaction date
       notes: i.string().optional(),
       vendor: i.string().optional(),    // Paid to / Received from
       paymentMethod: i.string().optional(), // Cash, Card, Transfer
       createdAt: i.date(),
+      // Transfer-specific fields (optional for backward compatibility)
+      toCurrency: i.string().optional(),    // Destination currency for transfers
+      toAmount: i.number().optional(),      // Calculated destination amount
+      exchangeRate: i.number().optional(),  // Exchange rate used for conversion
     }),
 
     // Daily closing balances (for historical record)

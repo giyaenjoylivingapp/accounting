@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { db } from "@/lib/db";
 import { TransactionItem, TransactionData, EmptyTransactions } from "./TransactionItem";
 import { TransactionForm } from "./TransactionForm";
+import { TransferForm } from "./TransferForm";
 import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -239,6 +240,7 @@ export function TransactionList({
               options={[
                 { value: "income", label: "Income" },
                 { value: "expense", label: "Expense" },
+                { value: "transfer", label: "Transfer" },
               ]}
               value={typeFilter}
               onChange={(e) => {
@@ -428,12 +430,20 @@ export function TransactionList({
         </p>
       )}
 
-      {/* Edit modal */}
-      <TransactionForm
-        isOpen={!!editingTransaction}
-        onClose={() => setEditingTransaction(null)}
-        editTransaction={editingTransaction}
-      />
+      {/* Edit modal - use appropriate form based on transaction type */}
+      {editingTransaction?.type === "transfer" ? (
+        <TransferForm
+          isOpen={!!editingTransaction}
+          onClose={() => setEditingTransaction(null)}
+          editTransaction={editingTransaction}
+        />
+      ) : (
+        <TransactionForm
+          isOpen={!!editingTransaction}
+          onClose={() => setEditingTransaction(null)}
+          editTransaction={editingTransaction}
+        />
+      )}
 
       {/* Delete confirmation modal */}
       <ConfirmationModal

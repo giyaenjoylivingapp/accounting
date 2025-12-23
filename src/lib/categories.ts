@@ -4,7 +4,7 @@ export interface Category {
   value: string;
   label: string;
   color: string;
-  type: "income" | "expense";
+  type: "income" | "expense" | "transfer";
 }
 
 // Expense categories
@@ -29,8 +29,13 @@ export const INCOME_CATEGORIES: Category[] = [
   { value: "other_income", label: "Other", color: "var(--cat-other)", type: "income" },
 ];
 
+// Transfer categories
+export const TRANSFER_CATEGORIES: Category[] = [
+  { value: "currency_exchange", label: "Currency Exchange", color: "var(--accent)", type: "transfer" },
+];
+
 // All categories combined
-export const ALL_CATEGORIES: Category[] = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES];
+export const ALL_CATEGORIES: Category[] = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES, ...TRANSFER_CATEGORIES];
 
 // Get category by value
 export function getCategoryByValue(value: string): Category | undefined {
@@ -38,8 +43,10 @@ export function getCategoryByValue(value: string): Category | undefined {
 }
 
 // Get categories by type
-export function getCategoriesByType(type: "income" | "expense"): Category[] {
-  return type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+export function getCategoriesByType(type: "income" | "expense" | "transfer"): Category[] {
+  if (type === "income") return INCOME_CATEGORIES;
+  if (type === "transfer") return TRANSFER_CATEGORIES;
+  return EXPENSE_CATEGORIES;
 }
 
 // Get category color (with fallback)

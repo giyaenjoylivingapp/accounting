@@ -21,6 +21,13 @@ export function DailySummary({ summary }: DailySummaryProps) {
 
   const isToday = summary.date === new Date().toISOString().split("T")[0];
 
+  // Check if there are any transfers
+  const hasTransfers =
+    (summary.transferOutUSD || 0) > 0 ||
+    (summary.transferInUSD || 0) > 0 ||
+    (summary.transferOutCDF || 0) > 0 ||
+    (summary.transferInCDF || 0) > 0;
+
   return (
     <Card variant="bordered" padding="none">
       {/* Header */}
@@ -35,7 +42,7 @@ export function DailySummary({ summary }: DailySummaryProps) {
 
       {/* Content - Responsive Grid */}
       <div className="p-4 lg:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className={`grid grid-cols-1 gap-4 lg:gap-6 ${hasTransfers ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
           {/* Opening Balance */}
           <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl">
             <p className="text-sm text-[var(--text-secondary)] mb-3 flex items-center gap-2">
@@ -89,6 +96,34 @@ export function DailySummary({ summary }: DailySummaryProps) {
               </p>
             </div>
           </div>
+
+          {/* Transfers - Only shown if there are transfers */}
+          {hasTransfers && (
+            <div className="p-4 rounded-xl" style={{ backgroundColor: "rgba(45, 212, 191, 0.1)" }}>
+              <p className="text-sm mb-3 flex items-center gap-2" style={{ color: "var(--accent)" }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                Transfers
+              </p>
+              <div className="space-y-1 text-sm">
+                {((summary.transferOutUSD || 0) > 0 || (summary.transferInUSD || 0) > 0) && (
+                  <p className="text-[var(--text-primary)]">
+                    <span style={{ color: "var(--expense)" }}>-{formatCurrency(summary.transferOutUSD || 0, "USD")}</span>
+                    {" / "}
+                    <span style={{ color: "var(--income)" }}>+{formatCurrency(summary.transferInUSD || 0, "USD")}</span>
+                  </p>
+                )}
+                {((summary.transferOutCDF || 0) > 0 || (summary.transferInCDF || 0) > 0) && (
+                  <p className="text-[var(--text-secondary)]">
+                    <span style={{ color: "var(--expense)" }}>-{formatCurrency(summary.transferOutCDF || 0, "CDF")}</span>
+                    {" / "}
+                    <span style={{ color: "var(--income)" }}>+{formatCurrency(summary.transferInCDF || 0, "CDF")}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Closing Balance */}
           <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl border-2 border-[var(--border-light)]">

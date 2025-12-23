@@ -2,15 +2,21 @@
 
 import { useState } from "react";
 import { TransactionForm } from "@/components/transactions/TransactionForm";
+import { TransferForm } from "@/components/transactions/TransferForm";
 import { TransactionType } from "@/lib/constants";
 
 export function QuickActions() {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [formType, setFormType] = useState<TransactionType>("expense");
 
   const openForm = (type: TransactionType) => {
     setFormType(type);
     setIsFormOpen(true);
+  };
+
+  const openTransferForm = () => {
+    setIsTransferFormOpen(true);
   };
 
   return (
@@ -37,11 +43,25 @@ export function QuickActions() {
           </svg>
           Expense
         </button>
+        <button
+          onClick={openTransferForm}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)]"
+          style={{ color: "var(--accent)" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+          Transfer
+        </button>
       </div>
 
       {/* Mobile FAB - Single button that opens a choice, positioned above bottom nav */}
       <div className="sm:hidden fixed bottom-20 right-4 z-50">
-        <MobileFAB onAddIncome={() => openForm("income")} onAddExpense={() => openForm("expense")} />
+        <MobileFAB
+          onAddIncome={() => openForm("income")}
+          onAddExpense={() => openForm("expense")}
+          onAddTransfer={openTransferForm}
+        />
       </div>
 
       {/* Transaction Form Modal */}
@@ -49,6 +69,12 @@ export function QuickActions() {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         defaultType={formType}
+      />
+
+      {/* Transfer Form Modal */}
+      <TransferForm
+        isOpen={isTransferFormOpen}
+        onClose={() => setIsTransferFormOpen(false)}
       />
     </>
   );
@@ -58,20 +84,22 @@ export function QuickActions() {
 function MobileFAB({
   onAddIncome,
   onAddExpense,
+  onAddTransfer,
 }: {
   onAddIncome: () => void;
   onAddExpense: () => void;
+  onAddTransfer: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       {/* Expanded options - slide in from right */}
       <div
         className={`
           flex items-center gap-2 overflow-hidden
           transition-all duration-300 ease-out
-          ${isExpanded ? "max-w-[280px]" : "max-w-0"}
+          ${isExpanded ? "max-w-[360px]" : "max-w-0"}
         `}
       >
         <button
@@ -79,7 +107,7 @@ function MobileFAB({
             setIsExpanded(false);
             onAddIncome();
           }}
-          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95"
+          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
           style={{ backgroundColor: "var(--income)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,13 +120,26 @@ function MobileFAB({
             setIsExpanded(false);
             onAddExpense();
           }}
-          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95"
+          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
           style={{ backgroundColor: "var(--expense)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m-8 8l8 8 8-8" />
           </svg>
           Expense
+        </button>
+        <button
+          onClick={() => {
+            setIsExpanded(false);
+            onAddTransfer();
+          }}
+          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
+          style={{ backgroundColor: "var(--accent)" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+          Transfer
         </button>
       </div>
 
