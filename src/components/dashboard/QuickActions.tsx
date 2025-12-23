@@ -65,49 +65,53 @@ function MobileFAB({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex flex-col-reverse items-end gap-3">
-      {/* Expanded options */}
-      {isExpanded && (
-        <>
-          <button
-            onClick={() => {
-              setIsExpanded(false);
-              onAddIncome();
-            }}
-            className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full shadow-lg text-sm font-medium text-white transition-transform"
-            style={{ backgroundColor: "var(--income)" }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8l-8-8-8 8" />
-            </svg>
-            Income
-          </button>
-          <button
-            onClick={() => {
-              setIsExpanded(false);
-              onAddExpense();
-            }}
-            className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full shadow-lg text-sm font-medium text-white transition-transform"
-            style={{ backgroundColor: "var(--expense)" }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m-8 8l8 8 8-8" />
-            </svg>
-            Expense
-          </button>
-        </>
-      )}
+    <div className="flex items-center gap-3">
+      {/* Expanded options - slide in from right */}
+      <div
+        className={`
+          flex items-center gap-2 overflow-hidden
+          transition-all duration-300 ease-out
+          ${isExpanded ? "max-w-[280px] opacity-100" : "max-w-0 opacity-0"}
+        `}
+      >
+        <button
+          onClick={() => {
+            setIsExpanded(false);
+            onAddIncome();
+          }}
+          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full shadow-lg text-sm font-medium text-white transition-transform hover:scale-105"
+          style={{ backgroundColor: "var(--income)" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8l-8-8-8 8" />
+          </svg>
+          Income
+        </button>
+        <button
+          onClick={() => {
+            setIsExpanded(false);
+            onAddExpense();
+          }}
+          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full shadow-lg text-sm font-medium text-white transition-transform hover:scale-105"
+          style={{ backgroundColor: "var(--expense)" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m-8 8l8 8 8-8" />
+          </svg>
+          Expense
+        </button>
+      </div>
 
       {/* Main FAB */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+        className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
           isExpanded ? "rotate-45 bg-[var(--bg-tertiary)]" : "bg-[var(--accent)]"
         }`}
         aria-label={isExpanded ? "Close" : "Add transaction"}
       >
         <svg
-          className={`w-5 h-5 ${isExpanded ? "text-[var(--text-primary)]" : "text-white"}`}
+          className={`w-5 h-5 transition-colors duration-200 ${isExpanded ? "text-[var(--text-primary)]" : "text-white"}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
