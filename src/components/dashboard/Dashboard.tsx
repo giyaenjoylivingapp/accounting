@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "@/lib/db";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -26,8 +26,24 @@ interface DashboardProps {
 
 type TabId = "dashboard" | "transactions" | "reports";
 
+const TAB_STORAGE_KEY = "giya-active-tab";
+
 export function Dashboard({ transactions, settings, userEmail }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("dashboard");
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(TAB_STORAGE_KEY);
+      if (saved === "dashboard" || saved === "transactions" || saved === "reports") {
+        return saved;
+      }
+    }
+    return "dashboard";
+  });
+
+  // Persist tab to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem(TAB_STORAGE_KEY, activeTab);
+  }, [activeTab]);
 
   // Calculate current balances
   const currentBalance = calculateCurrentBalance(
@@ -341,10 +357,10 @@ function ReportsContent({
   settings: BalanceSettings;
 }) {
   return (
-    <div className="p-4 lg:p-8 space-y-8">
+    <div className="p-4 lg:p-8 space-y-6">
       {/* Daily Cash Book Report */}
       <section>
-        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 print:hidden">
+        <h2 className="text-lg lg:text-xl font-bold text-[var(--text-primary)] mb-4 print:hidden">
           Daily Cash Book
         </h2>
         <DailyCashBookReport transactions={transactions} settings={settings} />
@@ -352,10 +368,10 @@ function ReportsContent({
 
       {/* Category Charts */}
       <section className="print:hidden">
-        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">
+        <h2 className="text-lg lg:text-xl font-bold text-[var(--text-primary)] mb-4">
           Expense Breakdown
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           <CategoryChart
             transactions={transactions}
             currency="USD"

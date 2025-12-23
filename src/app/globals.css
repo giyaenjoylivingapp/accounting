@@ -173,11 +173,10 @@ input:-webkit-autofill:focus {
     print-color-adjust: exact !important;
   }
 
-  /* Hide navigation, header, and controls */
+  /* Hide navigation and sidebar */
   header,
   nav,
-  aside,
-  .print\\:hidden {
+  aside {
     display: none !important;
   }
 
@@ -196,8 +195,21 @@ input:-webkit-autofill:focus {
 
   /* Page settings */
   @page {
-    size: A4 landscape;
-    margin: 1cm;
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
+  /* Hide all interactive elements in print */
+  button,
+  input,
+  select,
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Hide mobile FAB and controls */
+  [class*="fixed"] {
+    display: none !important;
   }
 
   /* Ensure table doesn't break across pages awkwardly */
@@ -216,14 +228,5 @@ input:-webkit-autofill:focus {
 
   tfoot {
     display: table-footer-group;
-  }
-
-  /* Remove shadows and borders for cleaner print */
-  .print\\:border-0 {
-    border: none !important;
-  }
-
-  .print\\:shadow-none {
-    box-shadow: none !important;
   }
 }
