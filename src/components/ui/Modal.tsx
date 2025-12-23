@@ -150,7 +150,7 @@ export function Modal({
         )}
 
         {/* Content - more padding on desktop */}
-        <div className="px-5 lg:px-6 py-4 lg:py-6 overflow-y-auto flex-1">{children}</div>
+        <div className="px-5 lg:px-6 py-4 lg:py-6 overflow-y-auto overflow-x-visible flex-1">{children}</div>
       </div>
     </div>
   );

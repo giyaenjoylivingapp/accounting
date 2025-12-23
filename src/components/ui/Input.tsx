@@ -27,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className="w-full min-w-0 max-w-full overflow-hidden">
+      <div className="w-full min-w-0 max-w-full">
         {label && (
           <label
             htmlFor={inputId}

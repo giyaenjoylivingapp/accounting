@@ -149,3 +149,81 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px var(--bg-tertiary) inset;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Print Styles for Cash Book Report */
+@media print {
+  /* Reset to white background for printing */
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --border-light: #cbd5e1;
+    --income: #059669;
+    --expense: #dc2626;
+  }
+
+  /* Hide non-printable elements */
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide navigation, header, and controls */
+  header,
+  nav,
+  aside,
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Make the report container full width */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Page settings */
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+
+  /* Ensure table doesn't break across pages awkwardly */
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  .print\\:border-0 {
+    border: none !important;
+  }
+
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+}

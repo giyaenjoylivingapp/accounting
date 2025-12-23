@@ -10,6 +10,7 @@ import { QuickActions } from "./QuickActions";
 import { CategoryChart } from "./CategoryChart";
 import { TransactionList } from "@/components/transactions/TransactionList";
 import { TransactionData } from "@/components/transactions/TransactionItem";
+import { DailyCashBookReport } from "@/components/reports/DailyCashBookReport";
 import { APP_NAME } from "@/lib/constants";
 import {
   calculateCurrentBalance,
@@ -214,7 +215,7 @@ export function Dashboard({ transactions, settings, userEmail }: DashboardProps)
             <TransactionsContent transactions={transactions} />
           )}
           {activeTab === "reports" && (
-            <ReportsContent transactions={transactions} />
+            <ReportsContent transactions={transactions} settings={settings} />
           )}
         </main>
 
@@ -332,21 +333,41 @@ function TransactionsContent({ transactions }: { transactions: TransactionData[]
 }
 
 // Reports Content
-function ReportsContent({ transactions }: { transactions: TransactionData[] }) {
+function ReportsContent({
+  transactions,
+  settings,
+}: {
+  transactions: TransactionData[];
+  settings: BalanceSettings;
+}) {
   return (
-    <div className="p-4 lg:p-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CategoryChart
-          transactions={transactions}
-          currency="USD"
-          title="Expense Breakdown (USD)"
-        />
-        <CategoryChart
-          transactions={transactions}
-          currency="CDF"
-          title="Expense Breakdown (CDF)"
-        />
-      </div>
+    <div className="p-4 lg:p-8 space-y-8">
+      {/* Daily Cash Book Report */}
+      <section>
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 print:hidden">
+          Daily Cash Book
+        </h2>
+        <DailyCashBookReport transactions={transactions} settings={settings} />
+      </section>
+
+      {/* Category Charts */}
+      <section className="print:hidden">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">
+          Expense Breakdown
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CategoryChart
+            transactions={transactions}
+            currency="USD"
+            title="Expenses by Category (USD)"
+          />
+          <CategoryChart
+            transactions={transactions}
+            currency="CDF"
+            title="Expenses by Category (CDF)"
+          />
+        </div>
+      </section>
     </div>
   );
 }
