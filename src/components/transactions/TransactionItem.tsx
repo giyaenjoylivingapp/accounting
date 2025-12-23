@@ -62,11 +62,11 @@ export function TransactionItem({
     >
       {/* Category Watermark */}
       <div
-        className="absolute inset-0 flex items-center justify-end pointer-events-none select-none overflow-hidden"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
         aria-hidden="true"
       >
         <span
-          className="text-[2.5rem] sm:text-[3rem] font-black uppercase tracking-wider pr-4 sm:pr-20"
+          className="text-[2.5rem] sm:text-[3rem] font-black uppercase tracking-wider"
           style={{
             color: categoryColor,
             opacity: 0.08,
