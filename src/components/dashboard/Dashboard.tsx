@@ -289,6 +289,7 @@ function DashboardContent({
               transactions={todayTransactions}
               showFilters={false}
               showDeleteButton={true}
+              showPagination={false}
             />
           </Card>
         </div>

@@ -119,13 +119,26 @@ export function TransactionForm({
 
     setLoading(true);
     try {
+      // Parse date as local time (not UTC) and add current time for today's transactions
+      const [year, month, day] = date.split("-").map(Number);
+      const now = new Date();
+      const transactionDate = new Date(year, month - 1, day);
+
+      // If the date is today, use the current time; otherwise use noon
+      const todayStr = now.toISOString().split("T")[0];
+      if (date === todayStr) {
+        transactionDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+      } else {
+        transactionDate.setHours(12, 0, 0); // Use noon for past/future dates
+      }
+
       const transactionData = {
         type,
         currency,
         amount: amountValue,
         category,
         description: description.trim(),
-        date: new Date(date),
+        date: transactionDate,
         vendor: vendor.trim() || undefined,
         paymentMethod: paymentMethod || undefined,
         notes: notes.trim() || undefined,

@@ -33,12 +33,15 @@ export function TransactionItem({
   const prefix = isIncome ? "+" : "-";
 
   const formatDate = (date: Date) => {
+    // Ensure we have a valid Date object
+    const dateObj = date instanceof Date ? date : new Date(date);
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
-    }).format(date);
+      hour12: true,
+    }).format(dateObj);
   };
 
   return (
