@@ -82,8 +82,7 @@ function MobileFAB({
           className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 active:translate-y-0.5"
           style={{
             backgroundColor: "var(--income)",
-            boxShadow: "0 4px 14px -2px rgba(34, 197, 94, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 4px 14px -2px rgba(34, 197, 94, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
           }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,8 +98,7 @@ function MobileFAB({
           className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 active:translate-y-0.5"
           style={{
             backgroundColor: "var(--expense)",
-            boxShadow: "0 4px 14px -2px rgba(239, 68, 68, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 4px 14px -2px rgba(239, 68, 68, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
           }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,9 +117,8 @@ function MobileFAB({
         style={{
           backgroundColor: isExpanded ? "var(--bg-tertiary)" : "var(--accent)",
           boxShadow: isExpanded
-            ? "0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05)"
-            : "0 6px 20px -4px rgba(99, 102, 241, 0.6), 0 3px 6px -2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
+            ? "0 2px 8px rgba(0, 0, 0, 0.15)"
+            : "0 6px 20px -4px rgba(99, 102, 241, 0.6), 0 3px 6px -2px rgba(0, 0, 0, 0.2)",
         }}
         aria-label={isExpanded ? "Close" : "Add transaction"}
       >
