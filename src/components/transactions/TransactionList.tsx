@@ -7,6 +7,7 @@ import { TransactionForm } from "./TransactionForm";
 import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ALL_CATEGORIES } from "@/lib/categories";
 import { Currency } from "@/lib/constants";
 
@@ -24,6 +25,8 @@ export function TransactionList({
   maxItems,
 }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<TransactionData | null>(null);
+  const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [currencyFilter, setCurrencyFilter] = useState<string>("");
@@ -69,10 +72,24 @@ export function TransactionList({
     filteredTransactions = filteredTransactions.slice(0, maxItems);
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this transaction?")) {
-      await db.transact(db.tx.transactions[id].delete());
+  const handleDeleteClick = (id: string) => {
+    setDeletingTransactionId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingTransactionId) return;
+
+    setIsDeleting(true);
+    try {
+      await db.transact(db.tx.transactions[deletingTransactionId].delete());
+      setDeletingTransactionId(null);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingTransactionId(null);
   };
 
   const clearFilters = () => {
@@ -168,7 +185,7 @@ export function TransactionList({
               transaction={transaction}
               onClick={() => setEditingTransaction(transaction)}
               onDelete={
-                showDeleteButton ? () => handleDelete(transaction.id) : undefined
+                showDeleteButton ? () => handleDeleteClick(transaction.id) : undefined
               }
             />
           ))}
@@ -188,6 +205,19 @@ export function TransactionList({
         isOpen={!!editingTransaction}
         onClose={() => setEditingTransaction(null)}
         editTransaction={editingTransaction}
+      />
+
+      {/* Delete confirmation modal */}
+      <ConfirmationModal
+        isOpen={!!deletingTransactionId}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
       />
     </div>
   );
