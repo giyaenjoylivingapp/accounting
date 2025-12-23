@@ -80,6 +80,23 @@ export function TransactionForm({
     color: c.color,
   }));
 
+  // Handle Enter key to submit form (except in textarea)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && e.target instanceof HTMLElement) {
+      // Don't submit if in textarea (allow newlines)
+      if (e.target.tagName === "TEXTAREA") {
+        return;
+      }
+      // Don't submit if in select (allow selection)
+      if (e.target.tagName === "SELECT") {
+        return;
+      }
+      // Submit the form
+      e.preventDefault();
+      e.currentTarget.requestSubmit();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -140,7 +157,7 @@ export function TransactionForm({
       title={isEditing ? "Edit Transaction" : "Add Transaction"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-5">
         {/* Type Toggle */}
         <Toggle
           options={[

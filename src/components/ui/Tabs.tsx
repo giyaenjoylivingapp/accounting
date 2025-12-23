@@ -29,6 +29,7 @@ export function Tabs({ tabs, defaultTab, onChange }: TabsProps) {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => handleTabClick(tab.id)}
             className={`
               flex-1 px-4 py-2 rounded-md text-sm font-medium
@@ -70,6 +71,7 @@ export function Toggle({ options, value, onChange }: ToggleProps) {
         return (
           <button
             key={option.value}
+            type="button"
             onClick={() => onChange(option.value)}
             className={`
               flex-1 px-4 py-2 rounded-md text-sm font-medium
