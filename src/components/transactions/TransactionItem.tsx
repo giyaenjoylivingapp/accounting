@@ -1,8 +1,8 @@
 "use client";
 
-import { CategoryBadge } from "./CategoryBadge";
 import { formatCurrency } from "@/lib/currency";
 import { Currency } from "@/lib/constants";
+import { getCategoryByValue } from "@/lib/categories";
 
 export interface TransactionData {
   id: string;
@@ -32,6 +32,11 @@ export function TransactionItem({
   const amountColor = isIncome ? "var(--income)" : "var(--expense)";
   const prefix = isIncome ? "+" : "-";
 
+  // Get category info for watermark
+  const categoryInfo = getCategoryByValue(transaction.category);
+  const categoryLabel = categoryInfo?.label || transaction.category;
+  const categoryColor = categoryInfo?.color || "var(--text-muted)";
+
   const formatDate = (date: Date) => {
     // Ensure we have a valid Date object
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -47,6 +52,7 @@ export function TransactionItem({
   return (
     <div
       className={`
+        relative overflow-hidden
         flex items-center gap-3 p-3 rounded-lg
         bg-[var(--bg-secondary)] border border-[var(--border-color)]
         hover:bg-[var(--bg-tertiary)] transition-colors
@@ -54,9 +60,26 @@ export function TransactionItem({
       `}
       onClick={onClick}
     >
+      {/* Category Watermark */}
+      <div
+        className="absolute inset-0 flex items-center justify-end pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <span
+          className="text-[2.5rem] sm:text-[3rem] font-black uppercase tracking-wider pr-4 sm:pr-20"
+          style={{
+            color: categoryColor,
+            opacity: 0.08,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {categoryLabel}
+        </span>
+      </div>
+
       {/* Icon */}
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative z-10"
         style={{
           backgroundColor: isIncome ? "var(--income-bg)" : "var(--expense-bg)",
         }}
@@ -95,13 +118,10 @@ export function TransactionItem({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <p className="font-medium text-[var(--text-primary)] truncate">
-            {transaction.description}
-          </p>
-          <CategoryBadge category={transaction.category} />
-        </div>
+      <div className="flex-1 min-w-0 relative z-10">
+        <p className="font-medium text-[var(--text-primary)] truncate mb-0.5">
+          {transaction.description}
+        </p>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span>{formatDate(transaction.date)}</span>
           {transaction.vendor && (
@@ -114,7 +134,7 @@ export function TransactionItem({
       </div>
 
       {/* Amount */}
-      <div className="text-right shrink-0">
+      <div className="text-right shrink-0 relative z-10">
         <p className="font-semibold" style={{ color: amountColor }}>
           {prefix}
           {formatCurrency(transaction.amount, transaction.currency)}
@@ -131,7 +151,7 @@ export function TransactionItem({
             e.stopPropagation();
             onDelete();
           }}
-          className="p-2 text-[var(--text-muted)] hover:text-[var(--error)] transition-colors"
+          className="p-2 text-[var(--text-muted)] hover:text-[var(--error)] transition-colors relative z-10"
           aria-label="Delete transaction"
         >
           <svg
