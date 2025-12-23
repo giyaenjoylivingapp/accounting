@@ -43,7 +43,7 @@ export function ConfirmationModal({
       setIsAnimating(false);
       const timeout = setTimeout(() => {
         setShouldRender(false);
-      }, 200);
+      }, 350);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
@@ -91,25 +91,35 @@ export function ConfirmationModal({
   return (
     <div
       className={`
-        fixed inset-0 z-50 flex items-center justify-center p-4
-        transition-opacity duration-200 ease-out
+        fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4
+        transition-opacity duration-300 ease-out
         ${isAnimating ? "opacity-100" : "opacity-0"}
       `}
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className={`
+          absolute inset-0 bg-black/60 backdrop-blur-sm
+          transition-opacity duration-300
+          ${isAnimating ? "opacity-100" : "opacity-0"}
+        `}
+      />
 
-      {/* Modal */}
+      {/* Modal - slides up on mobile, scales in on desktop */}
       <div
         ref={modalRef}
         className={`
-          relative w-full max-w-sm
+          relative w-full sm:max-w-sm
           bg-[var(--bg-secondary)]
           border border-[var(--border-color)]
-          shadow-2xl rounded-xl
-          transition-all duration-200 ease-out
-          ${isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0"}
+          shadow-2xl
+          rounded-t-2xl sm:rounded-xl
+          transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
+          ${isAnimating
+            ? "translate-y-0 sm:translate-y-0 sm:scale-100"
+            : "translate-y-full sm:translate-y-4 sm:scale-95"
+          }
         `}
         role="alertdialog"
         aria-modal="true"

@@ -43,7 +43,7 @@ export function Modal({
       // Wait for animation to complete before removing from DOM
       const timeout = setTimeout(() => {
         setShouldRender(false);
-      }, 200);
+      }, 350);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
@@ -76,13 +76,19 @@ export function Modal({
     <div
       className={`
         fixed inset-0 z-50 flex items-end lg:items-center justify-center
-        transition-opacity duration-200 ease-out
+        transition-opacity duration-300 ease-out
         ${isAnimating ? "opacity-100" : "opacity-0"}
       `}
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className={`
+          absolute inset-0 bg-black/60 backdrop-blur-sm
+          transition-opacity duration-300
+          ${isAnimating ? "opacity-100" : "opacity-0"}
+        `}
+      />
 
       {/* Modal - slides up on mobile, scales in on desktop */}
       <div
@@ -93,15 +99,15 @@ export function Modal({
           border border-[var(--border-color)]
           shadow-2xl
           max-h-[90vh] lg:max-h-[85vh] overflow-hidden flex flex-col
-          transition-all duration-200 ease-out
 
           /* Mobile: bottom sheet style */
           rounded-t-2xl lg:rounded-xl
 
-          /* Animation */
+          /* Animation - smooth slide up on mobile, scale on desktop */
+          transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
           ${isAnimating
             ? "translate-y-0 lg:translate-y-0 lg:scale-100"
-            : "translate-y-full lg:translate-y-0 lg:scale-95"
+            : "translate-y-full lg:translate-y-4 lg:scale-95"
           }
         `}
         role="dialog"
