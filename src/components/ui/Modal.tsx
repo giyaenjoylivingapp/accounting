@@ -97,10 +97,11 @@ export function Modal({
           bg-[var(--bg-secondary)]
           border border-[var(--border-color)]
           shadow-2xl
-          max-h-[90vh] lg:max-h-[85vh] overflow-hidden flex flex-col
+          max-h-[85vh] lg:max-h-[85vh] overflow-hidden flex flex-col
 
-          /* Mobile: bottom sheet style */
-          rounded-t-2xl lg:rounded-xl
+          /* Mobile: bottom sheet style with visible rounded top */
+          rounded-t-3xl lg:rounded-xl
+          mt-auto lg:mt-0
 
           /* Animation - smooth slide up on mobile, scale on desktop */
           transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
@@ -113,9 +114,13 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
       >
+        {/* Drag handle for mobile */}
+        <div className="lg:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-[var(--border-light)]" />
+        </div>
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-5 lg:px-6 py-4 border-b border-[var(--border-color)]">
+          <div className="flex items-center justify-between px-5 lg:px-6 pt-2 lg:pt-4 pb-4 border-b border-[var(--border-color)]">
             <h2
               id="modal-title"
               className="text-lg font-semibold text-[var(--text-primary)]"
