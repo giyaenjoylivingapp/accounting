@@ -3,6 +3,7 @@
 import { formatCurrency } from "@/lib/currency";
 import { Currency } from "@/lib/constants";
 import { getCategoryByValue } from "@/lib/categories";
+import { CategoryBadge } from "./CategoryBadge";
 
 export interface TransactionData {
   id: string;
@@ -60,13 +61,13 @@ export function TransactionItem({
       `}
       onClick={onClick}
     >
-      {/* Category Watermark */}
+      {/* Category Watermark - visible on large screens only */}
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+        className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none select-none overflow-hidden"
         aria-hidden="true"
       >
         <span
-          className="text-[2.5rem] sm:text-[3rem] font-black uppercase tracking-wider"
+          className="text-[3rem] font-black uppercase tracking-wider"
           style={{
             color: categoryColor,
             opacity: 0.08,
@@ -119,9 +120,15 @@ export function TransactionItem({
 
       {/* Content */}
       <div className="flex-1 min-w-0 relative z-10">
-        <p className="font-medium text-[var(--text-primary)] truncate mb-0.5">
-          {transaction.description}
-        </p>
+        <div className="flex items-center gap-2 mb-0.5">
+          <p className="font-medium text-[var(--text-primary)] truncate">
+            {transaction.description}
+          </p>
+          {/* Category Badge - visible on mobile only */}
+          <span className="lg:hidden">
+            <CategoryBadge category={transaction.category} />
+          </span>
+        </div>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span>{formatDate(transaction.date)}</span>
           {transaction.vendor && (
