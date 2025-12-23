@@ -25,31 +25,12 @@ export function DailySummary({ summary }: DailySummaryProps) {
     <Card variant="bordered" padding="none">
       {/* Header */}
       <div className="p-4 lg:p-6 border-b border-[var(--border-color)]">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg lg:text-xl font-semibold text-[var(--text-primary)]">
-              {isToday ? "Today's Summary" : "Daily Summary"}
-            </h3>
-            <p className="text-sm text-[var(--text-secondary)] mt-1">
-              {formatDate(summary.date)}
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-[var(--accent)] bg-opacity-20 flex items-center justify-center">
-            <svg
-              className="w-5 h-5 text-[var(--accent)]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-        </div>
+        <h3 className="text-lg lg:text-xl font-semibold text-[var(--text-primary)]">
+          {isToday ? "Today's Summary" : "Daily Summary"}
+        </h3>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
+          {formatDate(summary.date)}
+        </p>
       </div>
 
       {/* Content - Responsive Grid */}
