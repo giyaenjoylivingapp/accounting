@@ -389,7 +389,7 @@ export function TransactionList({
                 </svg>
               </Button>
 
-              <span className="px-3 py-1 text-sm text-[var(--text-secondary)]">
+              <span className="px-3 py-1 text-sm text-[var(--text-secondary)] whitespace-nowrap">
                 {currentPage} / {totalPages || 1}
               </span>
 
