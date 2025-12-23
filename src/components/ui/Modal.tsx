@@ -32,19 +32,18 @@ export function Modal({
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      // Small delay to trigger animation
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsAnimating(true);
-        });
-      });
+      // Use setTimeout to ensure the initial state is rendered before animating
+      const openTimeout = setTimeout(() => {
+        setIsAnimating(true);
+      }, 20);
+      return () => clearTimeout(openTimeout);
     } else {
       setIsAnimating(false);
       // Wait for animation to complete before removing from DOM
-      const timeout = setTimeout(() => {
+      const closeTimeout = setTimeout(() => {
         setShouldRender(false);
       }, 350);
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(closeTimeout);
     }
   }, [isOpen]);
 

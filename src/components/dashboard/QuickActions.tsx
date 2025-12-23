@@ -71,7 +71,7 @@ function MobileFAB({
         className={`
           flex items-center gap-2 overflow-hidden
           transition-all duration-300 ease-out
-          ${isExpanded ? "max-w-[280px] opacity-100" : "max-w-0 opacity-0"}
+          ${isExpanded ? "max-w-[280px]" : "max-w-0"}
         `}
       >
         <button
@@ -79,11 +79,8 @@ function MobileFAB({
             setIsExpanded(false);
             onAddIncome();
           }}
-          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 active:translate-y-0.5"
-          style={{
-            backgroundColor: "var(--income)",
-            boxShadow: "0 4px 14px -2px rgba(34, 197, 94, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
-          }}
+          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95"
+          style={{ backgroundColor: "var(--income)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8l-8-8-8 8" />
@@ -95,11 +92,8 @@ function MobileFAB({
             setIsExpanded(false);
             onAddExpense();
           }}
-          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 active:translate-y-0.5"
-          style={{
-            backgroundColor: "var(--expense)",
-            boxShadow: "0 4px 14px -2px rgba(239, 68, 68, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
-          }}
+          className="flex items-center justify-center gap-2 w-[120px] py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95"
+          style={{ backgroundColor: "var(--expense)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m-8 8l8 8 8-8" />
@@ -112,14 +106,8 @@ function MobileFAB({
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95 ${
-          isExpanded ? "rotate-45" : ""
+          isExpanded ? "rotate-45 bg-[var(--bg-tertiary)]" : "bg-[var(--accent)]"
         }`}
-        style={{
-          backgroundColor: isExpanded ? "var(--bg-tertiary)" : "var(--accent)",
-          boxShadow: isExpanded
-            ? "0 2px 8px rgba(0, 0, 0, 0.15)"
-            : "0 6px 20px -4px rgba(99, 102, 241, 0.6), 0 3px 6px -2px rgba(0, 0, 0, 0.2)",
-        }}
         aria-label={isExpanded ? "Close" : "Add transaction"}
       >
         <svg

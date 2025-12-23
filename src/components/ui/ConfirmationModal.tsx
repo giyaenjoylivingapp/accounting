@@ -34,17 +34,18 @@ export function ConfirmationModal({
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsAnimating(true);
-        });
-      });
+      // Use setTimeout to ensure the initial state is rendered before animating
+      const openTimeout = setTimeout(() => {
+        setIsAnimating(true);
+      }, 20);
+      return () => clearTimeout(openTimeout);
     } else {
       setIsAnimating(false);
-      const timeout = setTimeout(() => {
+      // Wait for animation to complete before removing from DOM
+      const closeTimeout = setTimeout(() => {
         setShouldRender(false);
       }, 350);
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(closeTimeout);
     }
   }, [isOpen]);
 
