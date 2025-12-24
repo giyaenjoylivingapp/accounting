@@ -171,6 +171,9 @@ input:-webkit-autofill:focus {
     background: white !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
   }
 
   /* Hide navigation and sidebar */
@@ -184,6 +187,7 @@ input:-webkit-autofill:focus {
   main {
     padding: 0 !important;
     margin: 0 !important;
+    width: 100% !important;
   }
 
   .print-container {
@@ -193,7 +197,7 @@ input:-webkit-autofill:focus {
     padding: 0 !important;
   }
 
-  /* Page settings */
+  /* Page settings - A4 format */
   @page {
     size: A4 portrait;
     margin: 1.5cm;
@@ -212,9 +216,32 @@ input:-webkit-autofill:focus {
     display: none !important;
   }
 
-  /* Ensure table doesn't break across pages awkwardly */
+  /*
+   * Force consistent layout regardless of viewport
+   * Override Tailwind responsive classes for print
+   */
+
+  /* Force hide mobile view in print (override lg:hidden) */
+  .lg\:hidden.print\:hidden {
+    display: none !important;
+  }
+
+  /* Force show desktop/print table (override hidden lg:block) */
+  .hidden.lg\:block.print\:block,
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Ensure table container shows properly */
+  .hidden.lg\:block.print\:block .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  /* Force table to full width in print */
   table {
+    width: 100% !important;
     page-break-inside: auto;
+    table-layout: auto !important;
   }
 
   tr {
@@ -228,5 +255,33 @@ input:-webkit-autofill:focus {
 
   tfoot {
     display: table-footer-group;
+  }
+
+  /* Ensure card/report container fills available width */
+  [class*="Card"],
+  .rounded-lg,
+  .rounded-xl {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Reset any max-width constraints */
+  .max-w-7xl,
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl,
+  .max-w-xl,
+  .max-w-lg,
+  .max-w-md,
+  .max-w-sm {
+    max-width: 100% !important;
+  }
+
+  /* Ensure text doesn't overflow */
+  td, th {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
   }
 }

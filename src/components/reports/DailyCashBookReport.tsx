@@ -369,34 +369,6 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
           </div>
         </div>
 
-        {/* Net Change Summary */}
-        <div className="p-4 print:p-3 border-t border-[var(--border-color)] print:border-gray-300">
-          <div className="grid grid-cols-2 gap-4 text-sm print:text-xs">
-            <div>
-              <p className="text-[var(--text-secondary)] print:text-gray-600 mb-1">Net Change (USD)</p>
-              <p className={`font-semibold ${
-                summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0) >= 0
-                  ? "text-[var(--income)] print:text-green-700"
-                  : "text-[var(--expense)] print:text-red-700"
-              }`}>
-                {summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0) >= 0 ? "+" : ""}
-                {formatCurrency(summary.incomeUSD - summary.expenseUSD + (summary.transferInUSD || 0) - (summary.transferOutUSD || 0), "USD")}
-              </p>
-            </div>
-            <div>
-              <p className="text-[var(--text-secondary)] print:text-gray-600 mb-1">Net Change (CDF)</p>
-              <p className={`font-semibold ${
-                summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0) >= 0
-                  ? "text-[var(--income)] print:text-green-700"
-                  : "text-[var(--expense)] print:text-red-700"
-              }`}>
-                {summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0) >= 0 ? "+" : ""}
-                {formatCurrency(summary.incomeCDF - summary.expenseCDF + (summary.transferInCDF || 0) - (summary.transferOutCDF || 0), "CDF")}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Footer - Print only */}
         <div className="hidden print:block p-3 border-t border-gray-200">
           <p className="text-[10px] text-gray-400 text-right">
