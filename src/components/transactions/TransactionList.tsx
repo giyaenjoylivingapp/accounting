@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { TransactionItem, TransactionData, EmptyTransactions } from "./TransactionItem";
 import { TransactionForm } from "./TransactionForm";
 import { TransferForm } from "./TransferForm";
-import { Select } from "@/components/ui/Select";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
@@ -225,51 +225,51 @@ export function TransactionList({
 
           {/* Filter row - responsive grid */}
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
-            <Select
+            <Dropdown
               options={timeFilterOptions}
               value={timeFilter}
-              onChange={(e) => {
-                setTimeFilter(e.target.value as TimeFilter);
+              onChange={(val) => {
+                setTimeFilter(val as TimeFilter);
                 resetPagination();
               }}
               placeholder="All time"
             />
 
-            <Select
+            <Dropdown
               options={[
                 { value: "income", label: "Income" },
                 { value: "expense", label: "Expense" },
                 { value: "transfer", label: "Transfer" },
               ]}
               value={typeFilter}
-              onChange={(e) => {
-                setTypeFilter(e.target.value);
+              onChange={(val) => {
+                setTypeFilter(val);
                 resetPagination();
               }}
               placeholder="All types"
             />
 
-            <Select
+            <Dropdown
               options={ALL_CATEGORIES.map((c) => ({
                 value: c.value,
                 label: c.label,
               }))}
               value={categoryFilter}
-              onChange={(e) => {
-                setCategoryFilter(e.target.value);
+              onChange={(val) => {
+                setCategoryFilter(val);
                 resetPagination();
               }}
               placeholder="All categories"
             />
 
-            <Select
+            <Dropdown
               options={[
                 { value: "USD", label: "USD" },
                 { value: "CDF", label: "CDF" },
               ]}
               value={currencyFilter}
-              onChange={(e) => {
-                setCurrencyFilter(e.target.value);
+              onChange={(val) => {
+                setCurrencyFilter(val);
                 resetPagination();
               }}
               placeholder="All currencies"
@@ -345,15 +345,14 @@ export function TransactionList({
           {/* Pagination controls - centered on mobile */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             {/* Items per page selector - hidden on mobile */}
-            <div className="hidden sm:block">
-              <Select
+            <div className="hidden sm:block w-[140px]">
+              <Dropdown
                 options={itemsPerPageOptions}
                 value={itemsPerPage.toString()}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
+                onChange={(val) => {
+                  setItemsPerPage(Number(val));
                   setCurrentPage(1);
                 }}
-                className="w-[130px]"
               />
             </div>
 

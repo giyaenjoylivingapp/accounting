@@ -5,7 +5,7 @@ import { id } from "@instantdb/react";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Tabs";
 import {
@@ -228,10 +228,10 @@ export function TransactionForm({
         {/* Category and Date row */}
         <div className="grid grid-cols-2 gap-3">
           {/* Category */}
-          <Select
+          <Dropdown
             options={categories}
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={setCategory}
             placeholder="Category"
             required
           />
@@ -269,13 +269,13 @@ export function TransactionForm({
                 onChange={(e) => setVendor(e.target.value)}
               />
 
-              <Select
+              <Dropdown
                 options={PAYMENT_METHODS.map((m) => ({
                   value: m.value,
                   label: m.label,
                 }))}
                 value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
+                onChange={setPaymentMethod}
                 placeholder="Payment method"
               />
             </div>

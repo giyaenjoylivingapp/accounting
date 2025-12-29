@@ -97,7 +97,7 @@ export function Modal({
           bg-[var(--bg-secondary)]
           border border-[var(--border-color)]
           shadow-2xl
-          max-h-[85vh] lg:max-h-[85vh] overflow-hidden flex flex-col
+          h-[95vh] max-h-[95vh] lg:h-auto lg:max-h-[85vh] overflow-hidden flex flex-col
 
           /* Mobile: bottom sheet style with visible rounded top */
           rounded-t-3xl lg:rounded-xl
