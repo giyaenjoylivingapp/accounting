@@ -55,12 +55,6 @@ export function LoginForm() {
     }
   };
 
-  const handleBack = () => {
-    setStep("email");
-    setCode("");
-    setError("");
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-primary)]">
       <Card variant="bordered" padding="lg" className="w-full max-w-sm">
@@ -135,14 +129,6 @@ export function LoginForm() {
             />
             <Button type="submit" fullWidth loading={loading}>
               Sign In
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              fullWidth
-              onClick={handleBack}
-            >
-              Use a different email
             </Button>
           </form>
         )}

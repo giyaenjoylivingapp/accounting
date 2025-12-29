@@ -164,7 +164,7 @@ export function Dashboard({ transactions, settings, userEmail }: DashboardProps)
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
         {/* Mobile Header - Simple top bar with logo and sign out */}
         <header className="lg:hidden sticky top-0 z-30 bg-[var(--bg-primary)]/95 backdrop-blur-sm border-b border-[var(--border-color)]">
           <div className="px-4 py-3">

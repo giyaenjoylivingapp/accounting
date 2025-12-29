@@ -93,34 +93,34 @@ function MobileFAB({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Expanded options - slide in from right */}
+    <div className="flex flex-col items-end gap-3">
+      {/* Expanded options - slide up vertically */}
       <div
         className={`
-          flex items-center gap-2 overflow-hidden
-          transition-all duration-300 ease-out
-          ${isExpanded ? "max-w-[360px]" : "max-w-0"}
+          flex flex-col items-end gap-2 overflow-hidden
+          transition-all duration-300 ease-out origin-bottom
+          ${isExpanded ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"}
         `}
       >
         <button
           onClick={() => {
             setIsExpanded(false);
-            onAddIncome();
+            onAddTransfer();
           }}
-          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
-          style={{ backgroundColor: "var(--income)" }}
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg"
+          style={{ backgroundColor: "var(--accent)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8l-8-8-8 8" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
-          Income
+          Transfer
         </button>
         <button
           onClick={() => {
             setIsExpanded(false);
             onAddExpense();
           }}
-          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg"
           style={{ backgroundColor: "var(--expense)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,22 +131,22 @@ function MobileFAB({
         <button
           onClick={() => {
             setIsExpanded(false);
-            onAddTransfer();
+            onAddIncome();
           }}
-          className="flex items-center justify-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap"
-          style={{ backgroundColor: "var(--accent)" }}
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-semibold text-white transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg"
+          style={{ backgroundColor: "var(--income)" }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8l-8-8-8 8" />
           </svg>
-          Transfer
+          Income
         </button>
       </div>
 
       {/* Main FAB */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95 ${
+        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg ${
           isExpanded ? "rotate-45 bg-[var(--bg-tertiary)]" : "bg-[var(--accent)]"
         }`}
         aria-label={isExpanded ? "Close" : "Add transaction"}

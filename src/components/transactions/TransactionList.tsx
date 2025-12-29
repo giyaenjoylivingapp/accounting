@@ -224,7 +224,7 @@ export function TransactionList({
           />
 
           {/* Filter row - responsive grid */}
-          <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-5 lg:gap-3">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
             <Select
               options={timeFilterOptions}
               value={timeFilter}
@@ -233,7 +233,6 @@ export function TransactionList({
                 resetPagination();
               }}
               placeholder="All time"
-              className="min-w-[120px] lg:w-full"
             />
 
             <Select
@@ -248,7 +247,6 @@ export function TransactionList({
                 resetPagination();
               }}
               placeholder="All types"
-              className="min-w-[120px] lg:w-full"
             />
 
             <Select
@@ -262,7 +260,6 @@ export function TransactionList({
                 resetPagination();
               }}
               placeholder="All categories"
-              className="min-w-[140px] lg:w-full"
             />
 
             <Select
@@ -276,7 +273,6 @@ export function TransactionList({
                 resetPagination();
               }}
               placeholder="All currencies"
-              className="min-w-[130px] lg:w-full"
             />
 
             {hasActiveFilters && (
@@ -284,7 +280,7 @@ export function TransactionList({
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="lg:w-full"
+                className="col-span-2 lg:col-span-1"
               >
                 Clear filters
               </Button>
@@ -345,26 +341,21 @@ export function TransactionList({
 
       {/* Pagination */}
       {showFilters && showPagination && !maxItems && limitedTransactions.length > 0 && (
-        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[var(--border-color)]">
-          {/* Results info */}
-          <p className="text-sm text-[var(--text-muted)] order-2 sm:order-1">
-            Showing {startIndex + 1}-{Math.min(endIndex, limitedTransactions.length)} of{" "}
-            {limitedTransactions.length} transactions
-            {hasActiveFilters && ` (filtered from ${transactions.length})`}
-          </p>
-
-          {/* Pagination controls */}
-          <div className="flex items-center gap-2 order-1 sm:order-2">
-            {/* Items per page selector */}
-            <Select
-              options={itemsPerPageOptions}
-              value={itemsPerPage.toString()}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="w-[130px]"
-            />
+        <div className="mt-4 pt-4 border-t border-[var(--border-color)] space-y-3">
+          {/* Pagination controls - centered on mobile */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Items per page selector - hidden on mobile */}
+            <div className="hidden sm:block">
+              <Select
+                options={itemsPerPageOptions}
+                value={itemsPerPage.toString()}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="w-[130px]"
+              />
+            </div>
 
             {/* Page navigation */}
             <div className="flex items-center gap-1">
@@ -419,6 +410,13 @@ export function TransactionList({
               </Button>
             </div>
           </div>
+
+          {/* Results info */}
+          <p className="text-sm text-[var(--text-muted)] text-center sm:text-left">
+            Showing {startIndex + 1}-{Math.min(endIndex, limitedTransactions.length)} of{" "}
+            {limitedTransactions.length} transactions
+            {hasActiveFilters && ` (filtered from ${transactions.length})`}
+          </p>
         </div>
       )}
 
