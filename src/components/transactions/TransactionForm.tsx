@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Tabs";
 import {
@@ -237,11 +238,9 @@ export function TransactionForm({
           />
 
           {/* Date */}
-          <Input
-            type="date"
+          <DatePicker
             value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
+            onChange={setDate}
           />
         </div>
 

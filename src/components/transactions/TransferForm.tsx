@@ -5,6 +5,7 @@ import { id } from "@instantdb/react";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Tabs";
 import { Currency, CURRENCIES, TRANSACTION_TYPES } from "@/lib/constants";
@@ -268,12 +269,10 @@ export function TransferForm({
         </div>
 
         {/* Date */}
-        <Input
+        <DatePicker
           label="Date"
-          type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
+          onChange={setDate}
         />
 
         {/* Description (optional) */}
