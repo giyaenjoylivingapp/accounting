@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { db } from "@/lib/db";
 import { TransactionItem, TransactionData, EmptyTransactions } from "./TransactionItem";
+import { TransactionTable } from "./TransactionTable";
+import { TransactionLedger } from "./TransactionLedger";
 import { TransactionForm } from "./TransactionForm";
 import { TransferForm } from "./TransferForm";
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -13,6 +15,7 @@ import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ALL_CATEGORIES } from "@/lib/categories";
 
 type TimeFilter = "all" | "this-week" | "this-month" | "last-month" | "custom";
+export type TransactionLayout = "cards" | "table" | "ledger";
 
 interface TransactionListProps {
   transactions: TransactionData[];
@@ -22,6 +25,9 @@ interface TransactionListProps {
   showPagination?: boolean;
   title?: string;
   subtitle?: string;
+  layout?: TransactionLayout;
+  initialBalanceUSD?: number;
+  initialBalanceCDF?: number;
 }
 
 // Helper functions for date filtering
@@ -50,6 +56,9 @@ export function TransactionList({
   showPagination = true,
   title,
   subtitle,
+  layout = "cards",
+  initialBalanceUSD = 0,
+  initialBalanceCDF = 0,
 }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<TransactionData | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
@@ -354,6 +363,22 @@ export function TransactionList({
       {/* Transaction list */}
       {paginatedTransactions.length === 0 ? (
         <EmptyTransactions />
+      ) : layout === "table" ? (
+        <TransactionTable
+          transactions={paginatedTransactions}
+          onRowClick={(t) => setEditingTransaction(t)}
+          onDelete={showDeleteButton ? handleDeleteClick : undefined}
+          showDeleteButton={showDeleteButton}
+        />
+      ) : layout === "ledger" ? (
+        <TransactionLedger
+          transactions={paginatedTransactions}
+          onRowClick={(t) => setEditingTransaction(t)}
+          onDelete={showDeleteButton ? handleDeleteClick : undefined}
+          showDeleteButton={showDeleteButton}
+          initialBalanceUSD={initialBalanceUSD}
+          initialBalanceCDF={initialBalanceCDF}
+        />
       ) : (
         <div className="space-y-2">
           {paginatedTransactions.map((transaction) => (

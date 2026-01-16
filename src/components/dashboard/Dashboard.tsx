@@ -8,8 +8,9 @@ import { BalanceCards } from "./BalanceCards";
 import { DailySummary } from "./DailySummary";
 import { QuickActions } from "./QuickActions";
 import { CategoryChart } from "./CategoryChart";
-import { TransactionList } from "@/components/transactions/TransactionList";
+import { TransactionList, TransactionLayout } from "@/components/transactions/TransactionList";
 import { TransactionData } from "@/components/transactions/TransactionItem";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { DailyCashBookReport } from "@/components/reports/DailyCashBookReport";
 import { APP_NAME } from "@/lib/constants";
 import {
@@ -228,7 +229,7 @@ export function Dashboard({ transactions, settings, userEmail }: DashboardProps)
             />
           )}
           {activeTab === "transactions" && (
-            <TransactionsContent transactions={transactions} />
+            <TransactionsContent transactions={transactions} settings={settings} />
           )}
           {activeTab === "reports" && (
             <ReportsContent transactions={transactions} settings={settings} />
@@ -329,17 +330,94 @@ function DashboardContent({
   );
 }
 
+// Layout storage key
+const LAYOUT_STORAGE_KEY = "giya-transaction-layout";
+
 // Transactions Content
-function TransactionsContent({ transactions }: { transactions: TransactionData[] }) {
+function TransactionsContent({
+  transactions,
+  settings,
+}: {
+  transactions: TransactionData[];
+  settings: BalanceSettings;
+}) {
+  const [layout, setLayout] = useState<TransactionLayout>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(LAYOUT_STORAGE_KEY);
+      if (saved === "cards" || saved === "table" || saved === "ledger") {
+        return saved;
+      }
+    }
+    return "cards";
+  });
+
+  // Persist layout preference
+  const handleLayoutChange = (value: string) => {
+    const newLayout = value as TransactionLayout;
+    setLayout(newLayout);
+    localStorage.setItem(LAYOUT_STORAGE_KEY, newLayout);
+  };
+
+  const layoutOptions = [
+    {
+      value: "cards",
+      label: "Cards",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      ),
+    },
+    {
+      value: "table",
+      label: "Table",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      value: "ledger",
+      label: "Ledger",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
     <div className="p-4 lg:p-8">
       <Card variant="bordered" padding="md" className="lg:p-6">
+        {/* Header with title and layout selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+              All Transactions
+            </h3>
+            <p className="text-sm text-[var(--text-muted)]">
+              {transactions.length} total transactions
+            </p>
+          </div>
+          <div className="hidden lg:block">
+            <SegmentedControl
+              options={layoutOptions}
+              value={layout}
+              onChange={handleLayoutChange}
+              size="sm"
+            />
+          </div>
+        </div>
+
         <TransactionList
           transactions={transactions}
           showFilters={true}
           showDeleteButton={true}
-          title="All Transactions"
-          subtitle={`${transactions.length} total transactions`}
+          layout={layout}
+          initialBalanceUSD={settings.initialBalanceUSD}
+          initialBalanceCDF={settings.initialBalanceCDF}
         />
       </Card>
     </div>
