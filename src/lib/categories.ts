@@ -18,6 +18,7 @@ export const EXPENSE_CATEGORIES: Category[] = [
   { value: "supplies", label: "Supplies", color: "var(--cat-supplies)", type: "expense" },
   { value: "transport", label: "Transport", color: "var(--cat-transport)", type: "expense" },
   { value: "taxes", label: "Taxes/Fees", color: "var(--cat-taxes)", type: "expense" },
+  { value: "factory_remittance", label: "Factory Remittance", color: "var(--cat-remittance)", type: "expense" },
   { value: "other_expense", label: "Other", color: "var(--cat-other)", type: "expense" },
 ];
 

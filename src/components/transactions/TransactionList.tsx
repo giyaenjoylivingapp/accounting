@@ -7,6 +7,7 @@ import { TransactionForm } from "./TransactionForm";
 import { TransferForm } from "./TransferForm";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Button } from "@/components/ui/Button";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ALL_CATEGORIES } from "@/lib/categories";
@@ -19,6 +20,8 @@ interface TransactionListProps {
   showDeleteButton?: boolean;
   maxItems?: number;
   showPagination?: boolean;
+  title?: string;
+  subtitle?: string;
 }
 
 // Helper functions for date filtering
@@ -45,6 +48,8 @@ export function TransactionList({
   showDeleteButton = true,
   maxItems,
   showPagination = true,
+  title,
+  subtitle,
 }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<TransactionData | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
@@ -194,128 +199,153 @@ export function TransactionList({
 
   return (
     <div>
+      {/* Header with title and clear filters */}
+      {title && (
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h3>
+            {subtitle && (
+              <p className="text-sm text-[var(--text-muted)]">{subtitle}</p>
+            )}
+          </div>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium transition-colors"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Filters */}
       {showFilters && (
         <div className="mb-4 space-y-3">
-          {/* Search - full width */}
-          <Input
-            type="text"
-            placeholder="Search transactions..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              resetPagination();
-            }}
-            leftIcon={
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            }
-          />
+          {/* All filters in one row on large screens */}
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-3">
+            {/* Search with clear button */}
+            <div className="lg:flex-1">
+              <Input
+                type="text"
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  resetPagination();
+                }}
+                leftIcon={
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                }
+                rightIcon={
+                  searchQuery ? (
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                        resetPagination();
+                      }}
+                      className="p-0.5 rounded hover:bg-[var(--bg-hover)] transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  ) : undefined
+                }
+              />
+            </div>
 
-          {/* Filter row - responsive grid */}
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
-            <Dropdown
-              options={timeFilterOptions}
-              value={timeFilter}
-              onChange={(val) => {
-                setTimeFilter(val as TimeFilter);
-                resetPagination();
-              }}
-              placeholder="All time"
-            />
+            {/* Filter dropdowns - grid on mobile, row on large screens */}
+            <div className="grid grid-cols-2 gap-2 lg:flex lg:gap-3">
+              <Dropdown
+                options={timeFilterOptions}
+                value={timeFilter}
+                onChange={(val) => {
+                  setTimeFilter(val as TimeFilter);
+                  resetPagination();
+                }}
+                placeholder="All time"
+              />
 
-            <Dropdown
-              options={[
-                { value: "income", label: "Income" },
-                { value: "expense", label: "Expense" },
-                { value: "transfer", label: "Transfer" },
-              ]}
-              value={typeFilter}
-              onChange={(val) => {
-                setTypeFilter(val);
-                resetPagination();
-              }}
-              placeholder="All types"
-            />
+              <Dropdown
+                options={[
+                  { value: "income", label: "Income" },
+                  { value: "expense", label: "Expense" },
+                  { value: "transfer", label: "Transfer" },
+                ]}
+                value={typeFilter}
+                onChange={(val) => {
+                  setTypeFilter(val);
+                  resetPagination();
+                }}
+                placeholder="All types"
+              />
 
-            <Dropdown
-              options={ALL_CATEGORIES.map((c) => ({
-                value: c.value,
-                label: c.label,
-              }))}
-              value={categoryFilter}
-              onChange={(val) => {
-                setCategoryFilter(val);
-                resetPagination();
-              }}
-              placeholder="All categories"
-            />
+              <Dropdown
+                options={ALL_CATEGORIES.map((c) => ({
+                  value: c.value,
+                  label: c.label,
+                }))}
+                value={categoryFilter}
+                onChange={(val) => {
+                  setCategoryFilter(val);
+                  resetPagination();
+                }}
+                placeholder="All categories"
+              />
 
-            <Dropdown
-              options={[
-                { value: "USD", label: "USD" },
-                { value: "CDF", label: "CDF" },
-              ]}
-              value={currencyFilter}
-              onChange={(val) => {
-                setCurrencyFilter(val);
-                resetPagination();
-              }}
-              placeholder="All currencies"
-            />
-
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="col-span-2 lg:col-span-1"
-              >
-                Clear filters
-              </Button>
-            )}
+              <Dropdown
+                options={[
+                  { value: "USD", label: "USD" },
+                  { value: "CDF", label: "CDF" },
+                ]}
+                value={currencyFilter}
+                onChange={(val) => {
+                  setCurrencyFilter(val);
+                  resetPagination();
+                }}
+                placeholder="All currencies"
+              />
+            </div>
           </div>
 
           {/* Custom date range inputs */}
           {timeFilter === "custom" && (
             <div className="flex flex-col sm:flex-row gap-2 p-3 bg-[var(--bg-tertiary)] rounded-lg">
-              <div className="flex-1">
-                <label className="block text-xs text-[var(--text-muted)] mb-1">
-                  From
-                </label>
-                <Input
-                  type="date"
-                  value={customStartDate}
-                  onChange={(e) => {
-                    setCustomStartDate(e.target.value);
-                    resetPagination();
-                  }}
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-xs text-[var(--text-muted)] mb-1">
-                  To
-                </label>
-                <Input
-                  type="date"
-                  value={customEndDate}
-                  onChange={(e) => {
-                    setCustomEndDate(e.target.value);
-                    resetPagination();
-                  }}
-                />
-              </div>
+              <DatePicker
+                label="From"
+                value={customStartDate}
+                onChange={(value) => {
+                  setCustomStartDate(value);
+                  if (value > customEndDate && customEndDate) {
+                    setCustomEndDate(value);
+                  }
+                  resetPagination();
+                }}
+                className="flex-1"
+              />
+              <DatePicker
+                label="To"
+                value={customEndDate}
+                min={customStartDate}
+                onChange={(value) => {
+                  setCustomEndDate(value);
+                  resetPagination();
+                }}
+                className="flex-1"
+              />
             </div>
           )}
         </div>

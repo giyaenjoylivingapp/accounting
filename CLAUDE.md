@@ -1,5 +1,7 @@
 # CLAUDE.md - InstantDB Best Practices & Project Guidelines
 
+create a todo list when working on complex tasks to track progress and remain on track                                                                                               
+         
 ## Project Overview
 
 This is an accounting web application built with Next.js and InstantDB as the real-time database.

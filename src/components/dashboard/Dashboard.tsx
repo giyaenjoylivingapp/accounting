@@ -334,14 +334,12 @@ function TransactionsContent({ transactions }: { transactions: TransactionData[]
   return (
     <div className="p-4 lg:p-8">
       <Card variant="bordered" padding="md" className="lg:p-6">
-        <CardHeader
-          title="All Transactions"
-          subtitle={`${transactions.length} total transactions`}
-        />
         <TransactionList
           transactions={transactions}
           showFilters={true}
           showDeleteButton={true}
+          title="All Transactions"
+          subtitle={`${transactions.length} total transactions`}
         />
       </Card>
     </div>

@@ -190,7 +190,8 @@ export function Dropdown({
           top: menuPosition.openUpward ? 'auto' : menuPosition.top,
           bottom: menuPosition.openUpward ? `${window.innerHeight - menuPosition.top}px` : 'auto',
           left: menuPosition.left,
-          width: menuPosition.width,
+          minWidth: menuPosition.width,
+          width: 'auto',
         }}
       >
         {options.length === 0 ? (
@@ -222,7 +223,7 @@ export function Dropdown({
               `}
               style={option.color && value !== option.value ? { color: option.color } : undefined}
             >
-              <span className="truncate">{option.label}</span>
+              <span className="whitespace-nowrap">{option.label}</span>
               {value === option.value && (
                 <svg
                   className="w-4 h-4 flex-shrink-0"

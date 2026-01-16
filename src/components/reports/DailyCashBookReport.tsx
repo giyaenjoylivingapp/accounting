@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { TransactionData } from "@/components/transactions/TransactionItem";
 import { formatCurrency } from "@/lib/currency";
-import { calculateDailySummary, BalanceSettings } from "@/lib/balance";
+import { calculateDateRangeSummary, BalanceSettings } from "@/lib/balance";
 import { APP_NAME } from "@/lib/constants";
 import { getCategoryLabel } from "@/lib/categories";
 
@@ -16,33 +16,37 @@ interface DailyCashBookReportProps {
 }
 
 export function DailyCashBookReport({ transactions, settings }: DailyCashBookReportProps) {
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const today = new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
 
-  // Get transactions for selected date
-  const selectedDateObj = new Date(selectedDate + "T12:00:00");
-  const dayTransactions = transactions
+  // Get transactions for selected date range
+  const startDateObj = new Date(startDate + "T12:00:00");
+  const endDateObj = new Date(endDate + "T12:00:00");
+
+  const filteredTransactions = transactions
     .filter((t) => {
       const txDate = new Date(t.date).toISOString().split("T")[0];
-      return txDate === selectedDate;
+      return txDate >= startDate && txDate <= endDate;
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Calculate summary for the selected date
-  const summary = calculateDailySummary(
-    settings,
-    transactions.map((t) => ({
-      id: t.id,
-      type: t.type,
-      amount: t.amount,
-      currency: t.currency,
-      date: t.date,
-      toCurrency: t.toCurrency,
-      toAmount: t.toAmount,
-    })),
-    selectedDateObj
-  );
+  // Prepare transactions for summary calculation
+  const mappedTransactions = transactions.map((t) => ({
+    id: t.id,
+    type: t.type,
+    amount: t.amount,
+    currency: t.currency,
+    date: t.date,
+    toCurrency: t.toCurrency,
+    toAmount: t.toAmount,
+  }));
+
+  // Calculate summary for the date range
+  const summary = calculateDateRangeSummary(settings, mappedTransactions, startDateObj, endDateObj);
+
+  // Check if it's a single day report
+  const isSingleDay = startDate === endDate;
 
   // Format date for display
   const formatDisplayDate = (dateStr: string) => {
@@ -70,33 +74,31 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
     return `${day}-${month}-${year}`;
   };
 
+  // Get filename suffix
+  const getFilenameSuffix = useCallback(() => {
+    if (isSingleDay) {
+      return formatDateForFilename(startDate);
+    }
+    return `${formatDateForFilename(startDate)}_to_${formatDateForFilename(endDate)}`;
+  }, [startDate, endDate, isSingleDay]);
+
   // Handle print with dynamic filename
   const handlePrint = useCallback(() => {
-    // Store original title
     const originalTitle = document.title;
-
-    // Format date for filename (DD-MM-YYYY)
-    const dateForFilename = formatDateForFilename(selectedDate);
-
-    // Set title to include the date (browsers use this as PDF filename)
-    document.title = `Gia Showroom Cash Book Report - ${dateForFilename}`;
-
-    // Print
+    document.title = `Gia Showroom Cash Book Report - ${getFilenameSuffix()}`;
     window.print();
-
-    // Restore original title after a short delay
     setTimeout(() => {
       document.title = originalTitle;
     }, 100);
-  }, [selectedDate]);
+  }, [getFilenameSuffix]);
 
-  // Set up beforeprint/afterprint event handlers for more reliable title management
+  // Set up beforeprint/afterprint event handlers
   useEffect(() => {
     const originalTitle = document.title;
-    const dateForFilename = formatDateForFilename(selectedDate);
+    const filenameSuffix = getFilenameSuffix();
 
     const handleBeforePrint = () => {
-      document.title = `Gia Showroom Cash Book Report - ${dateForFilename}`;
+      document.title = `Gia Showroom Cash Book Report - ${filenameSuffix}`;
     };
 
     const handleAfterPrint = () => {
@@ -110,28 +112,38 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
       window.removeEventListener("beforeprint", handleBeforePrint);
       window.removeEventListener("afterprint", handleAfterPrint);
     };
-  }, [selectedDate]);
+  }, [getFilenameSuffix]);
 
   return (
     <div className="space-y-4">
       {/* Controls - Hidden when printing */}
-      <div className="print:hidden flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-        <div className="flex-1 sm:flex-none">
-          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-            Select Date
-          </label>
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+      <div className="print:hidden">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+          <DatePicker
+            label="Start Date"
+            value={startDate}
+            onChange={(value) => {
+              setStartDate(value);
+              if (value > endDate) {
+                setEndDate(value);
+              }
+            }}
+            className="flex-1 sm:flex-none sm:w-48"
           />
+          <DatePicker
+            label="End Date"
+            value={endDate}
+            min={startDate}
+            onChange={setEndDate}
+            className="flex-1 sm:flex-none sm:w-48"
+          />
+          <Button onClick={handlePrint} className="sm:w-auto">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Print / Save PDF
+          </Button>
         </div>
-        <Button onClick={handlePrint} className="sm:w-auto">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          Print / Save PDF
-        </Button>
       </div>
 
       {/* Report Card */}
@@ -143,10 +155,13 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
               {APP_NAME}
             </h1>
             <h2 className="text-base lg:text-lg font-semibold text-[var(--text-secondary)] mt-1 print:text-gray-700 print:text-base">
-              Daily Cash Book Report
+              Cash Book Report
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-2 print:text-gray-600 print:text-sm print:font-medium">
-              {formatDisplayDate(selectedDate)}
+              {isSingleDay
+                ? formatDisplayDate(startDate)
+                : `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`
+              }
             </p>
           </div>
         </div>
@@ -170,13 +185,13 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
 
         {/* Mobile Transaction List - Card based layout */}
         <div className="lg:hidden print:hidden">
-          {dayTransactions.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="p-8 text-center text-[var(--text-muted)]">
-              No transactions for this date
+              No transactions for this period
             </div>
           ) : (
             <div className="divide-y divide-[var(--border-color)]">
-              {dayTransactions.map((tx) => (
+              {filteredTransactions.map((tx) => (
                 <div key={tx.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1 min-w-0">
@@ -184,6 +199,9 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
                         {tx.description}
                       </p>
                       <p className="text-sm text-[var(--text-muted)]">
+                        {!isSingleDay && (
+                          <span className="mr-1">{new Date(tx.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}</span>
+                        )}
                         {formatTime(tx.date)} • {getCategoryLabel(tx.category)}
                       </p>
                     </div>
@@ -246,7 +264,7 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
               <thead>
                 <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] print:bg-gray-100">
                   <th className="px-4 py-3 print:px-2 print:py-2 text-left font-semibold text-[var(--text-secondary)] print:text-gray-700">
-                    Time
+                    {isSingleDay ? "Time" : "Date/Time"}
                   </th>
                   <th className="px-4 py-3 print:px-2 print:py-2 text-left font-semibold text-[var(--text-secondary)] print:text-gray-700">
                     Description
@@ -269,14 +287,14 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
                 </tr>
               </thead>
               <tbody>
-                {dayTransactions.length === 0 ? (
+                {filteredTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-[var(--text-muted)] print:text-gray-500">
-                      No transactions for this date
+                      No transactions for this period
                     </td>
                   </tr>
                 ) : (
-                  dayTransactions.map((tx, index) => (
+                  filteredTransactions.map((tx, index) => (
                     <tr
                       key={tx.id}
                       className={`border-b border-[var(--border-color)] print:border-gray-200 ${
@@ -284,6 +302,9 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
                       } print:bg-white`}
                     >
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-[var(--text-secondary)] print:text-gray-600 whitespace-nowrap">
+                        {!isSingleDay && (
+                          <span className="mr-1">{new Date(tx.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}</span>
+                        )}
                         {formatTime(tx.date)}
                       </td>
                       <td className="px-4 py-3 print:px-2 print:py-1.5 text-[var(--text-primary)] print:text-black">
@@ -332,7 +353,7 @@ export function DailyCashBookReport({ transactions, settings }: DailyCashBookRep
               <tfoot>
                 <tr className="bg-[var(--bg-tertiary)] border-t-2 border-[var(--border-color)] font-semibold print:bg-gray-100">
                   <td colSpan={3} className="px-4 py-3 print:px-2 print:py-2 text-[var(--text-primary)] print:text-black">
-                    Day Totals
+                    {isSingleDay ? "Day Totals" : "Period Totals"}
                   </td>
                   <td className="px-4 py-3 print:px-2 print:py-2 text-right text-[var(--income)] print:text-green-700 whitespace-nowrap">
                     {formatCurrency(summary.incomeUSD, "USD")}

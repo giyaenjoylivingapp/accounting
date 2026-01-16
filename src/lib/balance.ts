@@ -221,6 +221,79 @@ export function getTransactionsForDateRange(
   });
 }
 
+// Calculate summary for a date range
+export function calculateDateRangeSummary(
+  initialBalance: BalanceSettings,
+  transactions: Transaction[],
+  startDate: Date,
+  endDate: Date
+): DailySummary {
+  const startOfRange = getStartOfDay(startDate);
+  const endOfRange = getEndOfDay(endDate);
+
+  // Get opening balance (all transactions before start date)
+  const opening = calculateOpeningBalance(initialBalance, transactions, startDate);
+
+  // Filter transactions within the date range
+  const rangeTransactions = transactions.filter((tx) => {
+    const txDate = new Date(tx.date);
+    return txDate >= startOfRange && txDate <= endOfRange;
+  });
+
+  // Calculate totals for the range
+  let incomeUSD = 0;
+  let incomeCDF = 0;
+  let expenseUSD = 0;
+  let expenseCDF = 0;
+  let transferOutUSD = 0;
+  let transferInUSD = 0;
+  let transferOutCDF = 0;
+  let transferInCDF = 0;
+
+  for (const tx of rangeTransactions) {
+    if (tx.type === TRANSACTION_TYPES.TRANSFER) {
+      if (tx.currency === "USD") {
+        transferOutUSD += tx.amount;
+      } else {
+        transferOutCDF += tx.amount;
+      }
+      if (tx.toCurrency && tx.toAmount) {
+        if (tx.toCurrency === "USD") {
+          transferInUSD += tx.toAmount;
+        } else {
+          transferInCDF += tx.toAmount;
+        }
+      }
+    } else if (tx.type === TRANSACTION_TYPES.INCOME) {
+      if (tx.currency === "USD") incomeUSD += tx.amount;
+      else incomeCDF += tx.amount;
+    } else {
+      if (tx.currency === "USD") expenseUSD += tx.amount;
+      else expenseCDF += tx.amount;
+    }
+  }
+
+  // Calculate closing balance
+  const closingUSD = opening.USD + incomeUSD - expenseUSD - transferOutUSD + transferInUSD;
+  const closingCDF = opening.CDF + incomeCDF - expenseCDF - transferOutCDF + transferInCDF;
+
+  return {
+    date: `${formatDateKey(startDate)} to ${formatDateKey(endDate)}`,
+    openingUSD: opening.USD,
+    openingCDF: opening.CDF,
+    incomeUSD,
+    incomeCDF,
+    expenseUSD,
+    expenseCDF,
+    transferOutUSD,
+    transferInUSD,
+    transferOutCDF,
+    transferInCDF,
+    closingUSD,
+    closingCDF,
+  };
+}
+
 // Calculate totals by category for a list of transactions
 export function calculateCategoryTotals(
   transactions: Transaction[]
